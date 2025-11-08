@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SNGR · Registro de Actividades Diarias – Jóvenes en Acción</title>
+
+  <!-- === Previews al compartir === -->
+  <link rel="canonical" href="https://TU-USUARIO.github.io/jovenes-actividades/">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Formulario interno para registrar actividades diarias del programa Jóvenes en Acción (SNGR).">
+  <meta name="theme-color" content="#2F338F">
+
+  <meta property="og:title" content="SNGR · Registro de Actividades Diarias">
+  <meta property="og:description" content="Ingresa cédula, categoría, actividad, horarios y evidencia.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://TU-USUARIO.github.io/jovenes-actividades/">
+  <meta property="og:site_name" content="Servicio Nacional de Gestión de Riesgos (SNGR)">
+  <meta property="og:image" content="https://TU-USUARIO.github.io/jovenes-actividades/og-actividades.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="es_EC">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SNGR · Registro de Actividades Diarias">
+  <meta name="twitter:description" content="Ingresa cédula, categoría, actividad, horarios y evidencia.">
+  <meta name="twitter:image" content="https://TU-USUARIO.github.io/jovenes-actividades/og-actividades.png">
+
+  <!-- Fuente -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --brand:#2F338F; --brand-600:#242870;
+      --bg:#f4f6fb; --card:#ffffff;
+      --text:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+      --radius:14px; --shadow:0 10px 25px rgba(17,24,39,.08);
+      --ok:#16a34a; --err:#dc2626; --warn:#f59e0b;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg); color:var(--text); display:flex; flex-direction:column;
+    }
+
+    /* Header */
+    .page-header{
+      background:linear-gradient(180deg,var(--brand) 0%, var(--brand-600) 100%);
+      color:#fff; padding:22px 16px;
+    }
+    .wrap{max-width:1080px; margin:0 auto; display:flex; align-items:center; gap:12px}
+    .logo{height:44px}
+    .h-txt h1{margin:0; font-size:1.28rem; font-weight:700}
+    .h-txt p{margin:4px 0 0; opacity:.9}
+
+    /* Card */
+    main{flex:1; display:flex; justify-content:center; padding:26px 14px}
+    .card{
+      width:100%; max-width:980px; background:var(--card); border-radius:14px;
+      box-shadow:var(--shadow); border:1px solid var(--line); overflow:hidden;
+    }
+    .card-head{padding:20px 20px 8px; border-bottom:1px solid var(--line)}
+    .card-head h2{margin:0; color:var(--brand); font-size:1.22rem}
+    .card-head p{margin:6px 0 0; color:var(--muted)}
+    .card-body{padding:20px}
+
+    /* Form */
+    .grid{display:grid; gap:14px; grid-template-columns:1fr}
+    @media(min-width:820px){ .grid{grid-template-columns:1fr 1fr} }
+    .full{grid-column:1 / -1}
+
+    label{font-weight:600; font-size:.92rem; margin-bottom:6px; display:block}
+    .input,.select,.textarea{
+      width:100%; padding:12px 12px; border:1px solid var(--line); border-radius:12px; background:#fff; font-size:1rem; outline:0;
+      transition:border .15s ease, box-shadow .15s ease;
+    }
+    .input:focus,.select:focus,.textarea:focus{border-color:#c7d2fe; box-shadow:0 0 0 4px rgba(59,130,246,.12)}
+    .input[readonly]{background:#f8fafc; color:#4b5563}
+    .textarea{min-height:96px; resize:vertical}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+
+    .helper{color:var(--muted); font-size:.9rem; margin-top:4px}
+
+    /* Cédula row (input + verificar + badge) */
+    .id-row{display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:end}
+    .btn{border:0; border-radius:12px; padding:12px 14px; font-weight:700; cursor:pointer; font-size:1rem}
+    .btn-primary{background:var(--brand); color:#fff}
+    .btn-primary:hover{background:var(--brand-600)}
+    .btn-secondary{background:#fff; border:1px solid var(--line)}
+    .btn-secondary:hover{background:#f3f4f6}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line);
+      padding:8px 10px; border-radius:999px; font-size:.9rem; color:#111827; background:#f8fafc;
+    }
+    .badge.ok{border-color:#86efac; background:#ecfdf5; color:#065f46}
+    .badge.err{border-color:#fecaca; background:#fef2f2; color:#7f1d1d}
+    .ic{width:18px; height:18px; display:inline-block; vertical-align:middle}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px; padding:8px 10px;
+      background:#f1f5f9; border:1px solid var(--line); color:#0f172a;
+      border-radius:999px; font-size:.9rem; font-weight:700;
+    }
+
+    .alert{
+      display:flex; gap:10px; padding:12px; border:1px solid #c7a20a33; background:#fffaf0; color:#7c2d12;
+      border-radius:12px; font-size:.95rem;
+    }
+
+    /* Toasts */
+    .toast{
+      position:fixed; right:14px; bottom:14px; display:none; z-index:9999;
+      min-width:260px; max-width:92vw; border-radius:12px; padding:12px 14px;
+      box-shadow:var(--shadow); border:1px solid var(--line); background:#fff; color:#111827;
+    }
+    .toast.show{display:block; animation:fadein .15s ease}
+    .toast.ok{border-left:6px solid var(--ok)}
+    .toast.err{border-left:6px solid var(--err)}
+    .toast .t-title{font-weight:800; margin-bottom:4px}
+    .toast .t-msg{font-size:.95rem; color:#374151}
+    @keyframes fadein{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)}}
+
+    footer{padding:14px; text-align:center; color:#e5e7eb; background:var(--brand-600)}
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <div class="wrap">
+      <img src="sngr.png" alt="SNGR" class="logo">
+      <div class="h-txt">
+        <h1>SNGR – Registro de Actividades Diarias</h1>
+        <p>Programa “Jóvenes en Acción” · Uso interno</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" role="region" aria-labelledby="t">
+      <div class="card-head">
+        <h2 id="t">Formulario de Actividades</h2>
+        <p>Verifica tu cédula. Si no estás registrado/a, completa tus apellidos y nombres.</p>
+      </div>
+
+      <div class="card-body">
+        <form id="frm" class="grid" novalidate>
+          <!-- CÉDULA + VERIFICACIÓN -->
+          <div class="full">
+            <label for="cedula">Cédula *</label>
+            <div class="id-row">
+              <input id="cedula" class="input" type="text" inputmode="numeric" placeholder="Ej.: 1753631652" required>
+              <button type="button" id="btn-verificar" class="btn btn-primary" aria-label="Verificar cédula">
+                <!-- icon search -->
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="11" cy="11" r="7" stroke-width="2"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"></line>
+                </svg>
+                Verificar
+              </button>
+              <span id="badge-estado" class="badge" hidden>
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20 6L9 17l-5-5" stroke-width="2"></path>
+                </svg>
+                Estado
+              </span>
+            </div>
+            <div class="helper">Solo números – se validan 10 dígitos.</div>
+          </div>
+
+          <!-- DATOS DE IDENTIDAD (se muestran según verificación) -->
+          <div id="ident-existente" class="full" hidden>
+            <div class="row">
+              <div>
+                <label for="apellidos_ro">Apellidos</label>
+                <input id="apellidos_ro" class="input" type="text" readonly>
+              </div>
+              <div>
+                <label for="nombres_ro">Nombres</label>
+                <input id="nombres_ro" class="input" type="text" readonly>
+              </div>
+            </div>
+          </div>
+
+          <div id="ident-nuevo" class="full" hidden>
+            <div class="row">
+              <div>
+                <label for="apellidos">Apellidos *</label>
+                <input id="apellidos" class="input" type="text" placeholder="Ej.: Pérez López">
+              </div>
+              <div>
+                <label for="nombres">Nombres *</label>
+                <input id="nombres" class="input" type="text" placeholder="Ej.: Ana María">
+              </div>
+            </div>
+            <div class="actions" style="margin-top:8px">
+              <button type="button" id="btn-registrar-persona" class="btn btn-secondary">
+                <!-- icon user-plus -->
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" stroke-width="2"/>
+                  <circle cx="9" cy="7" r="4" stroke-width="2"/>
+                  <line x1="19" y1="8" x2="19" y2="14" stroke-width="2"/>
+                  <line x1="16" y1="11" x2="22" y2="11" stroke-width="2"/>
+                </svg>
+                Registrar participante
+              </button>
+            </div>
+          </div>
+
+          <!-- FECHA -->
+          <div>
+            <label for="fecha">Fecha *</label>
+            <input id="fecha" class="input" type="date" required>
+          </div>
+
+          <!-- CATEGORÍA -->
+          <div class="full">
+            <label for="categoria">Categoría *</label>
+            <select id="categoria" class="select" required>
+              <option value="">Selecciona…</option>
+              <option>Actividades relacionadas con el proceso de Preparación y Respuesta ante Eventos Adversos</option>
+              <option>Administrativo</option>
+              <option>Técnico</option>
+              <option>Operativo en territorio</option>
+              <option>Operativo en oficina</option>
+            </select>
+          </div>
+
+          <!-- ACTIVIDAD -->
+          <div class="full">
+            <label for="actividad">Actividad *</label>
+            <input id="actividad" class="input" type="text" placeholder="Ej.: Levantamiento de información, apoyo en COE, informe técnico…" required>
+          </div>
+
+          <!-- HORAS -->
+          <div class="row">
+            <div>
+              <label for="hora_inicio">Hora inicio *</label>
+              <input id="hora_inicio" class="input" type="time" required>
+            </div>
+            <div>
+              <label for="hora_fin">Hora fin *</label>
+              <input id="hora_fin" class="input" type="time" required>
+            </div>
+          </div>
+          <div class="full">
+            <span class="pill" id="pill-horas" aria-live="polite">Horas calculadas: 0.00</span>
+          </div>
+
+          <!-- Responsable y Encargado -->
+          <div>
+            <label for="responsable">Responsable de la actividad</label>
+            <input id="responsable" class="input" type="text" value="Ing. Jose Smith" readonly>
+            <div class="helper">Responsable asignado al proceso.</div>
+          </div>
+          <div>
+            <label for="encargado">Encargado (opcional)</label>
+            <input id="encargado" class="input" type="text" placeholder="Ej.: Nombre de quien estuvo al frente">
+            <div class="helper">Si no estuvo el responsable de la actividad, ingresa quién estuvo al frente.</div>
+          </div>
+
+          <!-- Descripción, Ubicación, Evidencia -->
+          <div class="full">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" class="textarea" placeholder="Detalle breve de la actividad, hitos y resultados."></textarea>
+          </div>
+          <div>
+            <label for="ubicacion">Ubicación</label>
+            <input id="ubicacion" class="input" type="text" placeholder="Ej.: Auditorio UEB / Parroquia …">
+          </div>
+          <div>
+            <label for="evidencia_url">URL de evidencia</label>
+            <input id="evidencia_url" class="input" type="url" placeholder="Enlace a Drive, foto, video, documento">
+          </div>
+
+          <!-- Aviso / compromiso -->
+          <div class="full alert">
+            <div>
+              <strong>Importante:</strong> No subas información falsa ni manipulada. 
+              Todos los registros están sujetos a revisión y verificación por la SNGR. 
+              Los reportes falsos podrán ser observados o anulados y podrían derivar en sanciones o desvinculación del programa.
+            </div>
+          </div>
+          <div class="full">
+            <label style="display:flex; gap:10px; align-items:flex-start;">
+              <input id="chk-veracidad" type="checkbox" required style="margin-top:4px;">
+              <span>Declaro que la información registrada es <strong>veraz</strong> y que entiendo que está sujeta a revisión.</span>
+            </label>
+          </div>
+
+          <!-- Acciones -->
+          <div class="full" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+            <button type="submit" id="btn-guardar" class="btn btn-primary" disabled>
+              <!-- icon save -->
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M19 21H5a2 2 0 0 1-2-2V7l4-4h9l4 4v12a2 2 0 0 1-2 2z" stroke-width="2"/>
+                <path d="M7 21V10h10v11" stroke-width="2"/>
+              </svg>
+              Registrar actividad
+            </button>
+            <button type="button" id="btn-limpiar" class="btn btn-secondary">
+              <!-- icon broom -->
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 21h18" stroke-width="2"/>
+                <path d="M7 21v-8a5 5 0 0 1 10 0v8" stroke-width="2"/>
+                <path d="M12 3v5" stroke-width="2"/>
+              </svg>
+              Limpiar
+            </button>
+            <span id="hint-req" class="helper">Primero verifica o registra tu cédula.</span>
+          </div>
+
+          <div class="full helper">Los campos marcados con * son obligatorios.</div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <div class="t-title">Mensaje</div>
+    <div class="t-msg">Detalle</div>
+  </div>
+
+  <footer>© 2025 SNGR – Coordinación Zonal 5-8 · Uso interno</footer>
+
+  <script>
+    /* ======= CONFIG ======= */
+    const API_URL = "https://script.google.com/macros/s/AKfycbwuD498GGz7FDgNFctqdlEsAGez3QHiF3ievUou5oQWqSUIuT2oL5WEgpp-rbe72k5O/exec"; // <-- Reemplaza con tu Apps Script publicado
+
+    /* ======= DOM ======= */
+    const frm = document.getElementById('frm');
+    const cedula = document.getElementById('cedula');
+    const btnVerificar = document.getElementById('btn-verificar');
+    const badgeEstado = document.getElementById('badge-estado');
+
+    const identExistente = document.getElementById('ident-existente');
+    const apellidosRO = document.getElementById('apellidos_ro');
+    const nombresRO = document.getElementById('nombres_ro');
+
+    const identNuevo = document.getElementById('ident-nuevo');
+    const apellidos = document.getElementById('apellidos');
+    const nombres = document.getElementById('nombres');
+    const btnRegistrarPersona = document.getElementById('btn-registrar-persona');
+
+    const fecha = document.getElementById('fecha');
+    const categoria = document.getElementById('categoria');
+    const actividad = document.getElementById('actividad');
+    const hora_inicio = document.getElementById('hora_inicio');
+    const hora_fin = document.getElementById('hora_fin');
+
+    const pillHoras = document.getElementById('pill-horas');
+    const descripcion = document.getElementById('descripcion');
+    const ubicacion = document.getElementById('ubicacion');
+    const evidencia_url = document.getElementById('evidencia_url');
+
+    const responsable = document.getElementById('responsable');
+    const encargado = document.getElementById('encargado');
+
+    const chkVeracidad = document.getElementById('chk-veracidad');
+    const btnGuardar = document.getElementById('btn-guardar');
+    const btnLimpiar = document.getElementById('btn-limpiar');
+    const hintReq = document.getElementById('hint-req');
+
+    const toast = document.getElementById('toast');
+
+    /* ======= State ======= */
+    let state = {
+      verified: false,   // true si la cédula está verificada (existe o recién creada)
+      exists: false,     // true si ya existía
+      cedula: ''
+    };
+
+    /* ======= Init ======= */
+    (function init(){
+      const today = new Date().toISOString().slice(0,10);
+      fecha.value = today;
+    })();
+
+    /* ======= Utils ======= */
+    function showToast(title, msg, type){
+      toast.querySelector('.t-title').textContent = title || 'Mensaje';
+      toast.querySelector('.t-msg').textContent = msg || '';
+      toast.className = 'toast show ' + (type || '');
+      setTimeout(()=>{ toast.classList.remove('show'); }, 3500);
+    }
+
+    function setBadge(type, text){
+      badgeEstado.hidden = false;
+      badgeEstado.className = 'badge ' + (type || '');
+      badgeEstado.querySelector('svg').innerHTML = (type === 'ok')
+        ? '<path d="M20 6L9 17l-5-5" stroke-width="2"></path>'
+        : '<line x1="6" y1="6" x2="18" y2="18" stroke-width="2"></line><line x1="18" y1="6" x2="6" y2="18" stroke-width="2"></line>';
+      badgeEstado.lastChild.textContent = ' ' + text;
+    }
+
+    function enableSubmit(enabled){
+      btnGuardar.disabled = !enabled;
+      hintReq.textContent = enabled ? 'Puedes registrar la actividad.' : 'Primero verifica o registra tu cédula.';
+    }
+
+    function calcHoras(){
+      if (!hora_inicio.value || !hora_fin.value) return 0;
+      const [hi, mi] = hora_inicio.value.split(':').map(n=>+n||0);
+      const [hf, mf] = hora_fin.value.split(':').map(n=>+n||0);
+      const ini = hi + mi/60;
+      const fin = hf + mf/60;
+      let diff = +(fin - ini).toFixed(2);
+      if (isNaN(diff) || diff < 0) diff = 0;
+      return diff;
+    }
+    function updateHoras(){
+      const h = calcHoras();
+      pillHoras.textContent = 'Horas calculadas: ' + h.toFixed(2);
+      pillHoras.style.borderColor = h>0 ? '#d1fae5' : '#fee2e2';
+      pillHoras.style.background = h>0 ? '#ecfdf5' : '#fef2f2';
+      pillHoras.style.color = h>0 ? '#065f46' : '#7f1d1d';
+    }
+
+    function resetForm(){
+      frm.reset();
+      cedula.value = '';
+      apellidos.value = '';
+      nombres.value = '';
+      apellidosRO.value = '';
+      nombresRO.value = '';
+      identNuevo.hidden = true;
+      identExistente.hidden = true;
+      badgeEstado.hidden = true;
+      state = { verified:false, exists:false, cedula:'' };
+      enableSubmit(false);
+      const today = new Date().toISOString().slice(0,10);
+      fecha.value = today;
+      pillHoras.textContent = 'Horas calculadas: 0.00';
+      pillHoras.style.background = '#f1f5f9';
+      pillHoras.style.color = '#0f172a';
+      pillHoras.style.borderColor = '#e5e7eb';
+      responsable.value = 'Ing. Jose Smith';
+      cedula.focus();
+    }
+
+    /* ======= Validaciones suaves ======= */
+    cedula.addEventListener('input', ()=>{
+      cedula.value = cedula.value.replace(/\D+/g,'').slice(0,10);
+      state.verified = false;
+      enableSubmit(false);
+      badgeEstado.hidden = true;
+      identExistente.hidden = true;
+      identNuevo.hidden = true;
+    });
+
+    hora_inicio.addEventListener('change', updateHoras);
+    hora_fin.addEventListener('change', updateHoras);
+    hora_inicio.addEventListener('input', updateHoras);
+    hora_fin.addEventListener('input', updateHoras);
+
+    /* ======= Verificar cédula ======= */
+    btnVerificar.addEventListener('click', async ()=>{
+      const c = cedula.value.trim();
+      if (c.length !== 10){
+        showToast('Validación', 'La cédula debe tener 10 dígitos.', 'err');
+        return;
+      }
+      try{
+        const res = await fetch(API_URL, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ action:'verificarCedula', cedula:c })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok){
+          const msg = data?.error || ('Error HTTP ' + res.status);
+          setBadge('err','Error');
+          showToast('Error', msg, 'err');
+          return;
+        }
+
+        state.cedula = c;
+        if (data.found){
+          // Existe en base: mostrar nombres/apellidos (RO), habilitar submit
+          apellidosRO.value = data.apellidos || '';
+          nombresRO.value = data.nombres || '';
+          identExistente.hidden = false;
+          identNuevo.hidden = true;
+          setBadge('ok','Registrado');
+          state.verified = true;
+          state.exists = true;
+          enableSubmit(true);
+        }else{
+          // No existe: pedir registros
+          identExistente.hidden = true;
+          identNuevo.hidden = false;
+          setBadge('err','No registrado');
+          state.verified = false;
+          state.exists = false;
+          enableSubmit(false);
+          apellidos.focus();
+        }
+      }catch(err){
+        console.error(err);
+        setBadge('err','Error');
+        showToast('Conexión','No se pudo conectar con el servidor.','err');
+      }
+    });
+
+    /* ======= Registrar participante nuevo ======= */
+    btnRegistrarPersona.addEventListener('click', async ()=>{
+      const c = cedula.value.trim();
+      const a = apellidos.value.trim();
+      const n = nombres.value.trim();
+      if (c.length !== 10){
+        showToast('Validación','Cédula inválida.','err');
+        cedula.focus(); return;
+      }
+      if (!a || !n){
+        showToast('Validación','Completa Apellidos y Nombres.','err');
+        return;
+      }
+      try{
+        const res = await fetch(API_URL, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ action:'registrarParticipante', cedula:c, apellidos:a, nombres:n })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok){
+          const msg = data?.error || ('Error HTTP ' + res.status);
+          showToast('Error', msg, 'err');
+          return;
+        }
+        // Marcamos como verificado y mostramos en campos RO
+        apellidosRO.value = a;
+        nombresRO.value = n;
+        identNuevo.hidden = true;
+        identExistente.hidden = false;
+        state.verified = true;
+        state.exists = true;
+        setBadge('ok','Registrado');
+        enableSubmit(true);
+        showToast('Guardado','Participante registrado correctamente.','ok');
+      }catch(err){
+        console.error(err);
+        showToast('Conexión','No se pudo conectar con el servidor.','err');
+      }
+    });
+
+    /* ======= Submit Actividad ======= */
+    frm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+
+      if (!state.verified){
+        showToast('Validación','Primero verifica o registra tu cédula.','err');
+        return;
+      }
+      if (!chkVeracidad.checked){
+        showToast('Validación','Debes confirmar la veracidad de la información.','err');
+        return;
+      }
+
+      if (!fecha.value || !categoria.value || !actividad.value || !hora_inicio.value || !hora_fin.value){
+        showToast('Validación', 'Completa los campos obligatorios.', 'err');
+        return;
+      }
+      const horas = calcHoras();
+      if (horas === 0){
+        showToast('Validación', 'La hora fin debe ser mayor a la hora inicio.', 'err');
+        return;
+      }
+
+      const payload = {
+        action: 'registrarActividad',
+        fecha: fecha.value,
+        cedula: state.cedula || cedula.value.trim(),
+        categoria: categoria.value,
+        actividad: actividad.value,
+        descripcion: descripcion.value,
+        hora_inicio: hora_inicio.value,
+        hora_fin: hora_fin.value,
+        ubicacion: ubicacion.value,
+        evidencia_url: evidencia_url.value,
+        responsable: responsable.value,
+        encargado: encargado.value || '',
+        // Si tu backend quiere nombres/apellidos cuando se registró inline:
+        apellidos: state.exists ? undefined : (apellidos.value || apellidosRO.value || ''),
+        nombres:  state.exists ? undefined : (nombres.value || nombresRO.value || '')
+      };
+
+      try{
+        const res = await fetch(API_URL, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok){
+          const msg = data?.error || ('Error HTTP ' + res.status);
+          showToast('Error', msg, 'err');
+          return;
+        }
+        showToast('Guardado', 'Actividad registrada ('+ horas.toFixed(2) +' h).', 'ok');
+        resetForm();
+      }catch(err){
+        console.error(err);
+        showToast('Conexión', 'No se pudo conectar con el servidor.', 'err');
+      }
+    });
+
+    /* ======= Limpiar ======= */
+    btnLimpiar.addEventListener('click', resetForm);
+  </script>
+</body>
+</html>
