@@ -5,26 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SNGR · Registro de Actividades Diarias – Jóvenes en Acción</title>
 
-  <!-- === Previews al compartir === -->
-  <link rel="canonical" href="https://TU-USUARIO.github.io/jovenes-actividades/">
-  <meta name="robots" content="noindex, nofollow">
-  <meta name="description" content="Formulario interno para registrar actividades diarias del programa Jóvenes en Acción (SNGR).">
+  <meta name="description" content="Registro interno de actividades diarias del programa Jóvenes en Acción (SNGR).">
   <meta name="theme-color" content="#2F338F">
-
-  <meta property="og:title" content="SNGR · Registro de Actividades Diarias">
-  <meta property="og:description" content="Ingresa cédula, categoría, actividad, horarios y evidencia.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://TU-USUARIO.github.io/jovenes-actividades/">
-  <meta property="og:site_name" content="Servicio Nacional de Gestión de Riesgos (SNGR)">
-  <meta property="og:image" content="https://TU-USUARIO.github.io/jovenes-actividades/og-actividades.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:locale" content="es_EC">
-
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="SNGR · Registro de Actividades Diarias">
-  <meta name="twitter:description" content="Ingresa cédula, categoría, actividad, horarios y evidencia.">
-  <meta name="twitter:image" content="https://TU-USUARIO.github.io/jovenes-actividades/og-actividades.png">
 
   <!-- Fuente -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,7 +19,7 @@
       --bg:#f4f6fb; --card:#ffffff;
       --text:#1f2937; --muted:#6b7280; --line:#e5e7eb;
       --radius:14px; --shadow:0 10px 25px rgba(17,24,39,.08);
-      --ok:#16a34a; --err:#dc2626; --warn:#f59e0b;
+      --ok:#16a34a; --err:#dc2626;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -51,19 +33,19 @@
       background:linear-gradient(180deg,var(--brand) 0%, var(--brand-600) 100%);
       color:#fff; padding:22px 16px;
     }
-    .wrap{max-width:1080px; margin:0 auto; display:flex; align-items:center; gap:12px}
+    .wrap{max-width:980px; margin:0 auto; display:flex; align-items:center; gap:12px}
     .logo{height:44px}
-    .h-txt h1{margin:0; font-size:1.28rem; font-weight:700}
+    .h-txt h1{margin:0; font-size:1.2rem; font-weight:700}
     .h-txt p{margin:4px 0 0; opacity:.9}
 
     /* Card */
     main{flex:1; display:flex; justify-content:center; padding:26px 14px}
     .card{
-      width:100%; max-width:980px; background:var(--card); border-radius:14px;
+      width:100%; max-width:980px; background:var(--card); border-radius:var(--radius);
       box-shadow:var(--shadow); border:1px solid var(--line); overflow:hidden;
     }
     .card-head{padding:20px 20px 8px; border-bottom:1px solid var(--line)}
-    .card-head h2{margin:0; color:var(--brand); font-size:1.22rem}
+    .card-head h2{margin:0; color:var(--brand); font-size:1.1rem}
     .card-head p{margin:6px 0 0; color:var(--muted)}
     .card-body{padding:20px}
 
@@ -84,7 +66,6 @@
 
     .helper{color:var(--muted); font-size:.9rem; margin-top:4px}
 
-    /* Cédula row (input + verificar + badge) */
     .id-row{display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:end}
     .btn{border:0; border-radius:12px; padding:12px 14px; font-weight:700; cursor:pointer; font-size:1rem}
     .btn-primary{background:var(--brand); color:#fff}
@@ -110,7 +91,6 @@
       border-radius:12px; font-size:.95rem;
     }
 
-    /* Toasts */
     .toast{
       position:fixed; right:14px; bottom:14px; display:none; z-index:9999;
       min-width:260px; max-width:92vw; border-radius:12px; padding:12px 14px;
@@ -141,7 +121,7 @@
     <section class="card" role="region" aria-labelledby="t">
       <div class="card-head">
         <h2 id="t">Formulario de Actividades</h2>
-        <p>Verifica tu cédula. Si no estás registrado/a, completa tus apellidos y nombres.</p>
+        <p>Verifica tu cédula. Si no estás en la base, podrás registrar tu asistencia ingresando tus apellidos y nombres.</p>
       </div>
 
       <div class="card-body">
@@ -152,7 +132,6 @@
             <div class="id-row">
               <input id="cedula" class="input" type="text" inputmode="numeric" placeholder="Ej.: 1753631652" required>
               <button type="button" id="btn-verificar" class="btn btn-primary" aria-label="Verificar cédula">
-                <!-- icon search -->
                 <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <circle cx="11" cy="11" r="7" stroke-width="2"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"></line>
@@ -166,10 +145,10 @@
                 Estado
               </span>
             </div>
-            <div class="helper">Solo números – se validan 10 dígitos.</div>
+            <div class="helper">Solo números – 10 dígitos.</div>
           </div>
 
-          <!-- DATOS DE IDENTIDAD (se muestran según verificación) -->
+          <!-- Datos existentes (solo lectura) -->
           <div id="ident-existente" class="full" hidden>
             <div class="row">
               <div>
@@ -183,38 +162,36 @@
             </div>
           </div>
 
-          <div id="ident-nuevo" class="full" hidden>
+          <!-- Flujo manual si NO está en base -->
+          <div id="bloque-manual" class="full" hidden>
+            <div class="alert full">
+              <div><strong>No estás registrado/a.</strong> ¿Deseas registrar tu asistencia? Los datos serán revisados manualmente por los técnicos.</div>
+            </div>
+
+            <label style="display:flex; gap:10px; align-items:flex-start;" class="full">
+              <input id="chk-manual" type="checkbox" style="margin-top:4px;">
+              <span>Registrar asistencia manual (habilitar Apellidos y Nombres)</span>
+            </label>
+
             <div class="row">
               <div>
                 <label for="apellidos">Apellidos *</label>
-                <input id="apellidos" class="input" type="text" placeholder="Ej.: Pérez López">
+                <input id="apellidos" class="input" type="text" placeholder="Ej.: Pérez López" disabled>
               </div>
               <div>
                 <label for="nombres">Nombres *</label>
-                <input id="nombres" class="input" type="text" placeholder="Ej.: Ana María">
+                <input id="nombres" class="input" type="text" placeholder="Ej.: Ana María" disabled>
               </div>
-            </div>
-            <div class="actions" style="margin-top:8px">
-              <button type="button" id="btn-registrar-persona" class="btn btn-secondary">
-                <!-- icon user-plus -->
-                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" stroke-width="2"/>
-                  <circle cx="9" cy="7" r="4" stroke-width="2"/>
-                  <line x1="19" y1="8" x2="19" y2="14" stroke-width="2"/>
-                  <line x1="16" y1="11" x2="22" y2="11" stroke-width="2"/>
-                </svg>
-                Registrar participante
-              </button>
             </div>
           </div>
 
-          <!-- FECHA -->
+          <!-- Fecha -->
           <div>
             <label for="fecha">Fecha *</label>
             <input id="fecha" class="input" type="date" required>
           </div>
 
-          <!-- CATEGORÍA -->
+          <!-- Categoría -->
           <div class="full">
             <label for="categoria">Categoría *</label>
             <select id="categoria" class="select" required>
@@ -227,13 +204,13 @@
             </select>
           </div>
 
-          <!-- ACTIVIDAD -->
+          <!-- Actividad -->
           <div class="full">
             <label for="actividad">Actividad *</label>
             <input id="actividad" class="input" type="text" placeholder="Ej.: Levantamiento de información, apoyo en COE, informe técnico…" required>
           </div>
 
-          <!-- HORAS -->
+          <!-- Horas -->
           <div class="row">
             <div>
               <label for="hora_inicio">Hora inicio *</label>
@@ -248,7 +225,7 @@
             <span class="pill" id="pill-horas" aria-live="polite">Horas calculadas: 0.00</span>
           </div>
 
-          <!-- Responsable y Encargado -->
+          <!-- Responsable / Encargado -->
           <div>
             <label for="responsable">Responsable de la actividad</label>
             <input id="responsable" class="input" type="text" value="Ing. Jose Smith" readonly>
@@ -256,11 +233,10 @@
           </div>
           <div>
             <label for="encargado">Encargado (opcional)</label>
-            <input id="encargado" class="input" type="text" placeholder="Ej.: Nombre de quien estuvo al frente">
-            <div class="helper">Si no estuvo el responsable de la actividad, ingresa quién estuvo al frente.</div>
+            <input id="encargado" class="input" type="text" placeholder="Si no estuvo el responsable, indica quién estuvo al frente.">
           </div>
 
-          <!-- Descripción, Ubicación, Evidencia -->
+          <!-- Descripción / Ubicación -->
           <div class="full">
             <label for="descripcion">Descripción</label>
             <textarea id="descripcion" class="textarea" placeholder="Detalle breve de la actividad, hitos y resultados."></textarea>
@@ -269,16 +245,11 @@
             <label for="ubicacion">Ubicación</label>
             <input id="ubicacion" class="input" type="text" placeholder="Ej.: Auditorio UEB / Parroquia …">
           </div>
-          <div>
-            <label for="evidencia_url">URL de evidencia</label>
-            <input id="evidencia_url" class="input" type="url" placeholder="Enlace a Drive, foto, video, documento">
-          </div>
 
           <!-- Aviso / compromiso -->
           <div class="full alert">
             <div>
-              <strong>Importante:</strong> No subas información falsa ni manipulada. 
-              Todos los registros están sujetos a revisión y verificación por la SNGR. 
+              <strong>Importante:</strong> No registres información falsa. Todos los registros están sujetos a revisión por SNGR. 
               Los reportes falsos podrán ser observados o anulados y podrían derivar en sanciones o desvinculación del programa.
             </div>
           </div>
@@ -292,7 +263,6 @@
           <!-- Acciones -->
           <div class="full" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
             <button type="submit" id="btn-guardar" class="btn btn-primary" disabled>
-              <!-- icon save -->
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M19 21H5a2 2 0 0 1-2-2V7l4-4h9l4 4v12a2 2 0 0 1-2 2z" stroke-width="2"/>
                 <path d="M7 21V10h10v11" stroke-width="2"/>
@@ -300,7 +270,6 @@
               Registrar actividad
             </button>
             <button type="button" id="btn-limpiar" class="btn btn-secondary">
-              <!-- icon broom -->
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M3 21h18" stroke-width="2"/>
                 <path d="M7 21v-8a5 5 0 0 1 10 0v8" stroke-width="2"/>
@@ -308,7 +277,7 @@
               </svg>
               Limpiar
             </button>
-            <span id="hint-req" class="helper">Primero verifica o registra tu cédula.</span>
+            <span id="hint-req" class="helper">Primero verifica tu cédula.</span>
           </div>
 
           <div class="full helper">Los campos marcados con * son obligatorios.</div>
@@ -325,10 +294,10 @@
   <footer>© 2025 SNGR – Coordinación Zonal 5-8 · Uso interno</footer>
 
   <script>
-    /* ======= CONFIG ======= */
-    const API_URL = "https://script.google.com/macros/s/AKfycbwuD498GGz7FDgNFctqdlEsAGez3QHiF3ievUou5oQWqSUIuT2oL5WEgpp-rbe72k5O/exec"; // <-- Reemplaza con tu Apps Script publicado
+    // ======= CONFIG =======
+    const API_URL = "https://script.google.com/macros/s/AKfycbwuD498GGz7FDgNFctqdlEsAGez3QHiF3ievUou5oQWqSUIuT2oL5WEgpp-rbe72k5O/exec"; // <-- tu Apps Script publicado
 
-    /* ======= DOM ======= */
+    // ======= DOM =======
     const frm = document.getElementById('frm');
     const cedula = document.getElementById('cedula');
     const btnVerificar = document.getElementById('btn-verificar');
@@ -338,10 +307,10 @@
     const apellidosRO = document.getElementById('apellidos_ro');
     const nombresRO = document.getElementById('nombres_ro');
 
-    const identNuevo = document.getElementById('ident-nuevo');
+    const bloqueManual = document.getElementById('bloque-manual');
+    const chkManual = document.getElementById('chk-manual');
     const apellidos = document.getElementById('apellidos');
     const nombres = document.getElementById('nombres');
-    const btnRegistrarPersona = document.getElementById('btn-registrar-persona');
 
     const fecha = document.getElementById('fecha');
     const categoria = document.getElementById('categoria');
@@ -352,7 +321,6 @@
     const pillHoras = document.getElementById('pill-horas');
     const descripcion = document.getElementById('descripcion');
     const ubicacion = document.getElementById('ubicacion');
-    const evidencia_url = document.getElementById('evidencia_url');
 
     const responsable = document.getElementById('responsable');
     const encargado = document.getElementById('encargado');
@@ -364,27 +332,16 @@
 
     const toast = document.getElementById('toast');
 
-    /* ======= State ======= */
-    let state = {
-      verified: false,   // true si la cédula está verificada (existe o recién creada)
-      exists: false,     // true si ya existía
-      cedula: ''
-    };
+    // ======= State =======
+    let state = { verified:false, exists:false, cedula:'' };
 
-    /* ======= Init ======= */
-    (function init(){
-      const today = new Date().toISOString().slice(0,10);
-      fecha.value = today;
-    })();
-
-    /* ======= Utils ======= */
+    // ======= Utils =======
     function showToast(title, msg, type){
       toast.querySelector('.t-title').textContent = title || 'Mensaje';
       toast.querySelector('.t-msg').textContent = msg || '';
       toast.className = 'toast show ' + (type || '');
       setTimeout(()=>{ toast.classList.remove('show'); }, 3500);
     }
-
     function setBadge(type, text){
       badgeEstado.hidden = false;
       badgeEstado.className = 'badge ' + (type || '');
@@ -393,18 +350,15 @@
         : '<line x1="6" y1="6" x2="18" y2="18" stroke-width="2"></line><line x1="18" y1="6" x2="6" y2="18" stroke-width="2"></line>';
       badgeEstado.lastChild.textContent = ' ' + text;
     }
-
     function enableSubmit(enabled){
       btnGuardar.disabled = !enabled;
-      hintReq.textContent = enabled ? 'Puedes registrar la actividad.' : 'Primero verifica o registra tu cédula.';
+      hintReq.textContent = enabled ? 'Puedes registrar la actividad.' : 'Primero verifica o habilita el registro manual.';
     }
-
     function calcHoras(){
       if (!hora_inicio.value || !hora_fin.value) return 0;
       const [hi, mi] = hora_inicio.value.split(':').map(n=>+n||0);
       const [hf, mf] = hora_fin.value.split(':').map(n=>+n||0);
-      const ini = hi + mi/60;
-      const fin = hf + mf/60;
+      const ini = hi + mi/60, fin = hf + mf/60;
       let diff = +(fin - ini).toFixed(2);
       if (isNaN(diff) || diff < 0) diff = 0;
       return diff;
@@ -416,50 +370,49 @@
       pillHoras.style.background = h>0 ? '#ecfdf5' : '#fef2f2';
       pillHoras.style.color = h>0 ? '#065f46' : '#7f1d1d';
     }
-
     function resetForm(){
       frm.reset();
-      cedula.value = '';
-      apellidos.value = '';
-      nombres.value = '';
-      apellidosRO.value = '';
-      nombresRO.value = '';
-      identNuevo.hidden = true;
-      identExistente.hidden = true;
-      badgeEstado.hidden = true;
-      state = { verified:false, exists:false, cedula:'' };
-      enableSubmit(false);
       const today = new Date().toISOString().slice(0,10);
       fecha.value = today;
       pillHoras.textContent = 'Horas calculadas: 0.00';
       pillHoras.style.background = '#f1f5f9';
       pillHoras.style.color = '#0f172a';
       pillHoras.style.borderColor = '#e5e7eb';
+      // estados
+      state = { verified:false, exists:false, cedula:'' };
+      badgeEstado.hidden = true;
+      identExistente.hidden = true;
+      bloqueManual.hidden = true;
+      apellidos.value = ''; nombres.value = '';
+      apellidos.disabled = true; nombres.disabled = true;
+      chkManual.checked = false;
       responsable.value = 'Ing. Jose Smith';
+      enableSubmit(false);
       cedula.focus();
     }
 
-    /* ======= Validaciones suaves ======= */
+    // Init
+    (function(){ fecha.value = new Date().toISOString().slice(0,10); })();
+
+    // Validaciones suaves
     cedula.addEventListener('input', ()=>{
       cedula.value = cedula.value.replace(/\D+/g,'').slice(0,10);
       state.verified = false;
       enableSubmit(false);
       badgeEstado.hidden = true;
       identExistente.hidden = true;
-      identNuevo.hidden = true;
+      bloqueManual.hidden = true;
     });
-
-    hora_inicio.addEventListener('change', updateHoras);
-    hora_fin.addEventListener('change', updateHoras);
     hora_inicio.addEventListener('input', updateHoras);
     hora_fin.addEventListener('input', updateHoras);
+    hora_inicio.addEventListener('change', updateHoras);
+    hora_fin.addEventListener('change', updateHoras);
 
-    /* ======= Verificar cédula ======= */
+    // Verificar cédula
     btnVerificar.addEventListener('click', async ()=>{
       const c = cedula.value.trim();
       if (c.length !== 10){
-        showToast('Validación', 'La cédula debe tener 10 dígitos.', 'err');
-        return;
+        showToast('Validación','La cédula debe tener 10 dígitos.','err'); return;
       }
       try{
         const res = await fetch(API_URL, {
@@ -470,119 +423,84 @@
         const data = await res.json();
         if (!res.ok || !data.ok){
           const msg = data?.error || ('Error HTTP ' + res.status);
-          setBadge('err','Error');
-          showToast('Error', msg, 'err');
-          return;
+          setBadge('err','Error'); showToast('Error', msg, 'err'); return;
         }
-
         state.cedula = c;
+
         if (data.found){
-          // Existe en base: mostrar nombres/apellidos (RO), habilitar submit
           apellidosRO.value = data.apellidos || '';
-          nombresRO.value = data.nombres || '';
+          nombresRO.value  = data.nombres  || '';
           identExistente.hidden = false;
-          identNuevo.hidden = true;
-          setBadge('ok','Registrado');
-          state.verified = true;
-          state.exists = true;
+          bloqueManual.hidden = true;
+          setBadge('ok','Registrado · ' + (data.estado || ''));
+          state.verified = true; state.exists = true;
           enableSubmit(true);
-        }else{
-          // No existe: pedir registros
+        } else {
           identExistente.hidden = true;
-          identNuevo.hidden = false;
+          bloqueManual.hidden = false;
           setBadge('err','No registrado');
-          state.verified = false;
-          state.exists = false;
+          state.verified = false; state.exists = false;
           enableSubmit(false);
-          apellidos.focus();
         }
       }catch(err){
-        console.error(err);
-        setBadge('err','Error');
+        console.error(err); setBadge('err','Error');
         showToast('Conexión','No se pudo conectar con el servidor.','err');
       }
     });
 
-    /* ======= Registrar participante nuevo ======= */
-    btnRegistrarPersona.addEventListener('click', async ()=>{
-      const c = cedula.value.trim();
-      const a = apellidos.value.trim();
-      const n = nombres.value.trim();
-      if (c.length !== 10){
-        showToast('Validación','Cédula inválida.','err');
-        cedula.focus(); return;
-      }
-      if (!a || !n){
-        showToast('Validación','Completa Apellidos y Nombres.','err');
-        return;
-      }
-      try{
-        const res = await fetch(API_URL, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({ action:'registrarParticipante', cedula:c, apellidos:a, nombres:n })
-        });
-        const data = await res.json();
-        if (!res.ok || !data.ok){
-          const msg = data?.error || ('Error HTTP ' + res.status);
-          showToast('Error', msg, 'err');
-          return;
-        }
-        // Marcamos como verificado y mostramos en campos RO
-        apellidosRO.value = a;
-        nombresRO.value = n;
-        identNuevo.hidden = true;
-        identExistente.hidden = false;
-        state.verified = true;
-        state.exists = true;
-        setBadge('ok','Registrado');
-        enableSubmit(true);
-        showToast('Guardado','Participante registrado correctamente.','ok');
-      }catch(err){
-        console.error(err);
-        showToast('Conexión','No se pudo conectar con el servidor.','err');
-      }
+    // Toggle manual
+    chkManual.addEventListener('change', ()=>{
+      const on = chkManual.checked;
+      apellidos.disabled = !on;
+      nombres.disabled = !on;
+      enableSubmit(on); // sólo permite enviar si habilita modo manual
+      if (on) apellidos.focus();
     });
 
-    /* ======= Submit Actividad ======= */
+    // Enviar
     frm.addEventListener('submit', async (e)=>{
       e.preventDefault();
 
-      if (!state.verified){
-        showToast('Validación','Primero verifica o registra tu cédula.','err');
-        return;
-      }
       if (!chkVeracidad.checked){
-        showToast('Validación','Debes confirmar la veracidad de la información.','err');
-        return;
+        showToast('Validación','Debes confirmar la veracidad.','err'); return;
       }
-
       if (!fecha.value || !categoria.value || !actividad.value || !hora_inicio.value || !hora_fin.value){
-        showToast('Validación', 'Completa los campos obligatorios.', 'err');
-        return;
+        showToast('Validación','Completa los campos obligatorios.','err'); return;
       }
       const horas = calcHoras();
       if (horas === 0){
-        showToast('Validación', 'La hora fin debe ser mayor a la hora inicio.', 'err');
-        return;
+        showToast('Validación','La hora fin debe ser mayor a la hora inicio.','err'); return;
+      }
+
+      // Si no existe en base, debe estar activo el modo manual y llenar apellidos/nombres
+      let ape = '', nom = '';
+      if (state.exists){
+        ape = apellidosRO.value || '';
+        nom = nombresRO.value || '';
+      } else {
+        if (!chkManual.checked){
+          showToast('Validación','Habilita el registro manual para continuar.','err'); return;
+        }
+        if (!apellidos.value.trim() || !nombres.value.trim()){
+          showToast('Validación','Ingresa Apellidos y Nombres.','err'); return;
+        }
+        ape = apellidos.value.trim();
+        nom = nombres.value.trim();
       }
 
       const payload = {
         action: 'registrarActividad',
         fecha: fecha.value,
         cedula: state.cedula || cedula.value.trim(),
+        apellidos: ape,
+        nombres: nom,
         categoria: categoria.value,
         actividad: actividad.value,
         descripcion: descripcion.value,
         hora_inicio: hora_inicio.value,
         hora_fin: hora_fin.value,
         ubicacion: ubicacion.value,
-        evidencia_url: evidencia_url.value,
-        responsable: responsable.value,
-        encargado: encargado.value || '',
-        // Si tu backend quiere nombres/apellidos cuando se registró inline:
-        apellidos: state.exists ? undefined : (apellidos.value || apellidosRO.value || ''),
-        nombres:  state.exists ? undefined : (nombres.value || nombresRO.value || '')
+        encargado: encargado.value || ''
       };
 
       try{
@@ -594,18 +512,17 @@
         const data = await res.json();
         if (!res.ok || !data.ok){
           const msg = data?.error || ('Error HTTP ' + res.status);
-          showToast('Error', msg, 'err');
-          return;
+          showToast('Error', msg, 'err'); return;
         }
-        showToast('Guardado', 'Actividad registrada ('+ horas.toFixed(2) +' h).', 'ok');
+        showToast('Guardado','Actividad registrada ('+ horas.toFixed(2) +' h).','ok');
         resetForm();
       }catch(err){
         console.error(err);
-        showToast('Conexión', 'No se pudo conectar con el servidor.', 'err');
+        showToast('Conexión','No se pudo conectar con el servidor.','err');
       }
     });
 
-    /* ======= Limpiar ======= */
+    // Limpiar
     btnLimpiar.addEventListener('click', resetForm);
   </script>
 </body>
