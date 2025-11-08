@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* Mismos estilos CSS de tus otros archivos */
+    /* Estilos CSS (Sin cambios) */
     :root{
       --brand:#2F338F; --brand-600:#242870;
       --bg:#f4f6fb; --card:#ffffff;
@@ -74,19 +74,15 @@
       padding:14px 16px; border:1px solid;
       border-radius:12px; font-size:.95rem; margin:8px 0 16px;
     }
-    /* Clases de 'notice' para diferentes estados */
     .notice.err{border-color:var(--err); background:#fef2f2; color:#7f1d1d;}
     .notice.ok{border-color:var(--ok); background:#ecfdf5; color:#065f46;}
     .notice.info{border-color:#93c5fd; background:#eff6ff; color:var(--info);}
-
-    /* Contenedor para la info de la sesión */
     .session-info {
       background: #f8fafc; border: 1px solid var(--line); border-radius: 12px;
       padding: 16px; margin-top: 10px;
     }
     .session-info p { margin: 0 0 8px 0; font-size: 1rem; }
     .session-info span { font-weight: 600; color: var(--brand); }
-    
     .spinner{
       width:16px; height:16px; border-radius:50%;
       border:2px solid rgba(255,255,255,.55);
@@ -103,7 +99,7 @@
   
   <header class="page-header">
     <div class="wrap">
-      <img src="sngr.png" alt="SNGR" class="logo">
+      <img src="sngr.png" alt="SNGR" class="logo"> 
       <div class="h-txt">
         <h1>SNGR – Registro de Capacitación</h1>
         <p>Programa “Jóvenes en Acción” · Uso interno</p>
@@ -157,7 +153,7 @@
             </div>
           </div>
           
-          <div id="bloque-mensaje" class="full notice" hidden></div>
+          <div id="bloque-mensaje" class="full" hidden></div>
 
           <div id="bloque-registro" class="full" style="display:none; margin-top: 16px; border-top: 1px solid var(--line); padding-top: 20px;">
             <div class="session-info">
@@ -197,4 +193,161 @@
     function showMensaje(msg, type = 'info') {
       bloqueMensaje.textContent = msg;
       bloqueMensaje.className = `full notice ${type}`; // Asigna 'info', 'ok', o 'err'
-      bloque
+      bloqueMensaje.hidden = false;
+    }
+    
+    // --- HELPER: Función para ocultar todos los bloques ---
+    function ocultarBloques() {
+      identExistente.hidden = true;
+      bloqueNoEncontrado.hidden = true;
+      
+      bloqueMensaje.hidden = true;
+      // ===============================================================
+      // CORRECCIÓN 2: Se añadió esta línea para resetear la clase
+      // ===============================================================
+      bloqueMensaje.className = 'full'; 
+
+      bloqueRegistro.style.display = 'none';
+      badgeEstado.hidden = true;
+    }
+
+    // --- HELPER: Función para validar el horario ---
+    function validarHorario(fechaStr, inicioStr, finStr) {
+      try {
+        const now = new Date(); // Hora local del cliente
+        
+        const [y, m, d] = fechaStr.split('-').map(Number);
+        const [h_inicio, m_inicio] = inicioStr.split(':').map(Number);
+        const [h_fin, m_fin] = finStr.split(':').map(Number);
+
+        const fechaInicio = new Date(y, m - 1, d, h_inicio, m_inicio, 0); 
+        const fechaFin = new Date(y, m - 1, d, h_fin, m_fin, 0);
+
+        if (now < fechaInicio) {
+          return { ok: false, msg: `Tu horario de registro aún no comienza. Puedes registrarte a partir de las ${inicioStr} del ${fechaStr}.` };
+        }
+        if (now > fechaFin) {
+          return { ok: false, msg: `El horario para registrar tu asistencia ha finalizado. La hora límite era las ${finStr} del ${fechaStr}.` };
+        }
+        
+        return { ok: true, msg: 'OK' };
+
+      } catch(e) {
+        console.error("Error al parsear fechas: ", e, {fechaStr, inicioStr, finStr});
+        return { ok: false, msg: 'Error al validar el horario. Contacta al administrador.' };
+      }
+    }
+
+
+    // --- 1. VERIFICAR CÉDULA ---
+    btnVerificar.addEventListener('click', async () => {
+      ocultarBloques(); // Ocultar todo al empezar
+      const cedula = cedulaInput.value.trim();
+      if (cedula.length !== 10) {
+        showMensaje('La cédula debe tener 10 dígitos.', 'err');
+        return;
+      }
+
+      const originalBtnHTML = btnVerificar.innerHTML;
+      btnVerificar.disabled = true;
+      cedulaInput.disabled = true;
+      btnVerificar.innerHTML = '<span class="spinner"></span> Verificando...';
+
+      try {
+        const params = new URLSearchParams();
+        params.append('action', 'verificarCedula');
+        params.append('cedula', cedula);
+
+        const res = await fetch(API_URL, { method: 'POST', body: params });
+        const data = await res.json();
+
+        if (data.found) {
+          // --- PARTICIPANTE ENCONTRADO ---
+          identExistente.hidden = false;
+          document.getElementById('apellidos_ro').value = data.apellidos || '';
+          document.getElementById('nombres_ro').value = data.nombres || '';
+          badgeEstado.hidden = false;
+
+          if (data.estado === 'Asistió' || data.estado === 'Registrado') {
+            badgeEstado.textContent = 'Asistencia Registrada';
+            badgeEstado.className = 'badge ok';
+            showMensaje('¡Ya has registrado tu asistencia para esta sesión!', 'ok');
+            
+          } else if (data.estado === 'Habilitado') {
+            // --- ESTÁ HABILITADO, AHORA VALIDAR HORA ---
+            badgeEstado.textContent = 'Habilitado';
+            badgeEstado.className = 'badge ok';
+            
+            const horario = validarHorario(data.fecha, data.horaInicio, data.horaFin);
+            
+            if (horario.ok) {
+              // ¡EN HORA! Mostrar bloque de registro
+              bloqueRegistro.style.display = 'block';
+              document.getElementById('info-modalidad').textContent = data.modalidad;
+              document.getElementById('info-horario').textContent = `${data.horaInicio} - ${data.horaFin} del ${data.fecha}`;
+            } else {
+              // Habilitado, pero fuera de hora
+              showMensaje(horario.msg, 'info');
+            }
+            
+          } else {
+            // "Pendiente" o cualquier otro estado
+            badgeEstado.textContent = 'No Habilitado';
+            badgeEstado.className = 'badge err';
+            showMensaje('Aún no estás habilitado para registrar asistencia. Contacta a tu coordinador.', 'info');
+          }
+
+        } else {
+          // --- PARTICIPANTE NO ENCONTRADO ---
+          bloqueNoEncontrado.hidden = false;
+          badgeEstado.hidden = true;
+        }
+        
+      } catch (err) {
+        console.error(err);
+        showMensaje('Error de conexión. Revisa tu internet e intenta nuevamente.', 'err');
+      } finally {
+        btnVerificar.disabled = false;
+        cedulaInput.disabled = false;
+        btnVerificar.innerHTML = originalBtnHTML;
+      }
+    });
+
+    // --- 2. REGISTRAR ASISTENCIA (SUBMIT) ---
+    document.getElementById('frm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const originalBtnHTML = btnRegistrar.innerHTML;
+      btnRegistrar.disabled = true;
+      btnRegistrar.innerHTML = '<span class="spinner"></span> Registrando...';
+      
+      try {
+        const params = new URLSearchParams();
+        params.append('action', 'registrarAsistencia');
+        params.append('cedula', cedulaInput.value.trim());
+
+        const res = await fetch(API_URL, { method: 'POST', body: params });
+        const data = await res.json();
+
+        if (data.success) {
+          ocultarBloques(); 
+          identExistente.hidden = false;
+          badgeEstado.textContent = 'Asistencia Registrada';
+          badgeEstado.className = 'badge ok';
+          showMensaje('¡Asistencia registrada con éxito!', 'ok');
+        } else {
+          showMensaje(data.message || 'Error desconocido.', 'err');
+          btnRegistrar.disabled = false;
+          btnRegistrar.innerHTML = originalBtnHTML;
+        }
+        
+      } catch(err) {
+        console.error(err);
+        showMensaje('Error de conexión. No se pudo registrar.', 'err');
+        btnRegistrar.disabled = false;
+        btnRegistrar.innerHTML = originalBtnHTML;
+      }
+    });
+  </script>
+</body>
+</html>
