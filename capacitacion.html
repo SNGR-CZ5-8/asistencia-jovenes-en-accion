@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* Estilos CSS (Sin cambios) */
+    /* Tus estilos CSS (sin cambios) */
     :root{
       --brand:#2F338F; --brand-600:#242870;
       --bg:#f4f6fb; --card:#ffffff;
@@ -176,7 +176,7 @@
   <footer>© 2025 SNGR – Coordinación Zonal 5-8 · Uso interno</footer>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwuD498GGz7FDgNFctqdlEsAGez3QHiF3ievUou5oQWqSUIuT2oL5WEgpp-rbe72k5O/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwuD498GGz7FDgNFctqdlEsAGez3QHiF3ievUou5oQWqSUIuT2oL5WEgpp-rbe72k5O/exec"; // ¡Asegúrate que esta sea tu URL de implementación MÁS RECIENTE!
 
     // --- ELEMENTOS DEL DOM ---
     const cedulaInput = document.getElementById('cedula');
@@ -192,7 +192,7 @@
     // --- HELPER: Función para mostrar mensajes ---
     function showMensaje(msg, type = 'info') {
       bloqueMensaje.textContent = msg;
-      bloqueMensaje.className = `full notice ${type}`; // Asigna 'info', 'ok', o 'err'
+      bloqueMensaje.className = `full notice ${type}`; 
       bloqueMensaje.hidden = false;
     }
     
@@ -202,10 +202,7 @@
       bloqueNoEncontrado.hidden = true;
       
       bloqueMensaje.hidden = true;
-      // ===============================================================
-      // CORRECCIÓN 2: Se añadió esta línea para resetear la clase
-      // ===============================================================
-      bloqueMensaje.className = 'full'; 
+      bloqueMensaje.className = 'full'; // Resetea la clase (esto es de una corrección anterior)
 
       bloqueRegistro.style.display = 'none';
       badgeEstado.hidden = true;
@@ -214,7 +211,7 @@
     // --- HELPER: Función para validar el horario ---
     function validarHorario(fechaStr, inicioStr, finStr) {
       try {
-        const now = new Date(); // Hora local del cliente
+        const now = new Date(); 
         
         const [y, m, d] = fechaStr.split('-').map(Number);
         const [h_inicio, m_inicio] = inicioStr.split(':').map(Number);
@@ -241,7 +238,7 @@
 
     // --- 1. VERIFICAR CÉDULA ---
     btnVerificar.addEventListener('click', async () => {
-      ocultarBloques(); // Ocultar todo al empezar
+      ocultarBloques(); 
       const cedula = cedulaInput.value.trim();
       if (cedula.length !== 10) {
         showMensaje('La cédula debe tener 10 dígitos.', 'err');
@@ -260,45 +257,50 @@
 
         const res = await fetch(API_URL, { method: 'POST', body: params });
         const data = await res.json();
+        
+        // --- INICIO DE LA CORRECCIÓN ---
+        // (La línea de abajo es para depurar, puedes borrarla si quieres)
+        console.log('DATOS RECIBIDOS:', data); 
 
         if (data.found) {
-          // --- PARTICIPANTE ENCONTRADO ---
           identExistente.hidden = false;
           document.getElementById('apellidos_ro').value = data.apellidos || '';
           document.getElementById('nombres_ro').value = data.nombres || '';
           badgeEstado.hidden = false;
 
-          if (data.estado === 'Asistió' || data.estado === 'Registrado') {
+          // Hacemos que la variable sea fácil de leer (ej. "HABILITADO", "ASISTIÓ", "PENDIENTE")
+          const estadoAsistencia = (data.estado_asistencia || 'PENDIENTE').toUpperCase();
+
+          // CAMBIO: Se usa 'estadoAsistencia' en lugar de 'data.estado'
+          if (estadoAsistencia === 'ASISTIÓ' || estadoAsistencia === 'REGISTRADO') {
             badgeEstado.textContent = 'Asistencia Registrada';
             badgeEstado.className = 'badge ok';
             showMensaje('¡Ya has registrado tu asistencia para esta sesión!', 'ok');
             
-          } else if (data.estado === 'Habilitado') {
-            // --- ESTÁ HABILITADO, AHORA VALIDAR HORA ---
+          // CAMBIO: Se usa 'estadoAsistencia' en lugar de 'data.estado'
+          } else if (estadoAsistencia === 'HABILITADO') {
             badgeEstado.textContent = 'Habilitado';
             badgeEstado.className = 'badge ok';
             
             const horario = validarHorario(data.fecha, data.horaInicio, data.horaFin);
             
             if (horario.ok) {
-              // ¡EN HORA! Mostrar bloque de registro
               bloqueRegistro.style.display = 'block';
               document.getElementById('info-modalidad').textContent = data.modalidad;
               document.getElementById('info-horario').textContent = `${data.horaInicio} - ${data.horaFin} del ${data.fecha}`;
             } else {
-              // Habilitado, pero fuera de hora
               showMensaje(horario.msg, 'info');
             }
             
           } else {
-            // "Pendiente" o cualquier otro estado
+            // "PENDIENTE" o cualquier otro estado
             badgeEstado.textContent = 'No Habilitado';
             badgeEstado.className = 'badge err';
             showMensaje('Aún no estás habilitado para registrar asistencia. Contacta a tu coordinador.', 'info');
           }
+          // --- FIN DE LA CORRECCIÓN ---
 
         } else {
-          // --- PARTICIPANTE NO ENCONTRADO ---
           bloqueNoEncontrado.hidden = false;
           badgeEstado.hidden = true;
         }
@@ -314,6 +316,7 @@
     });
 
     // --- 2. REGISTRAR ASISTENCIA (SUBMIT) ---
+    // (Esta función estaba bien, no necesita cambios)
     document.getElementById('frm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
