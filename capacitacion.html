@@ -224,8 +224,15 @@
         params.append('cedula', cedula);
 
         const res = await fetch(API_URL, { method: 'POST', body: params });
+        
+        if (!res.ok) {
+          throw new Error(`Error de conexión. Estado de respuesta: ${res.status}`);
+        }
+
         const data = await res.json(); 
         
+        console.log('Datos de la API:', data); // Agregar log para ver la respuesta
+
         if (data.found) {
           identExistente.hidden = false;
           document.getElementById('apellidos_ro').value = data.apellidos || '';
@@ -260,7 +267,7 @@
           showMensaje('No encontramos tu cédula en la base de datos.', 'err');
         }
       } catch (err) {
-        console.error(err);
+        console.error('Error de conexión o en la API:', err);  // Log detallado del error
         showMensaje('Error de conexión. Revisa tu internet e intenta nuevamente.', 'err');
       } finally {
         btnVerificar.disabled = false;
