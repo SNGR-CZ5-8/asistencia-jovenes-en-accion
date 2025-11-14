@@ -176,7 +176,7 @@
   <footer>© 2025 SNGR – Coordinación Zonal 5-8 · Uso interno</footer>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwuD498GGz7FDgNFctqdlEsAGez3QHiF3ievUou5oQWqSUIuT2oL5WEgpp-rbe72k5O/exec"; // ¡Asegúrate que esta sea tu URL de implementación MÁS RECIENTE!
+    const API_URL = "https://script.google.com/macros/s/AKfycbwuD498GGz7FDgNFctqdlEsAGez3QHiF3ievUou5oQWqSUIuT2oL5WEgpp-rbe72k5O/exec"; 
 
     // --- ELEMENTOS DEL DOM ---
     const cedulaInput = document.getElementById('cedula');
@@ -189,52 +189,20 @@
     const bloqueRegistro = document.getElementById('bloque-registro');
     const btnRegistrar = document.getElementById('btn-registrar');
 
-    // --- HELPER: Función para mostrar mensajes ---
+    // --- FUNCIONES --- 
     function showMensaje(msg, type = 'info') {
       bloqueMensaje.textContent = msg;
       bloqueMensaje.className = `full notice ${type}`; 
       bloqueMensaje.hidden = false;
     }
-    
-    // --- HELPER: Función para ocultar todos los bloques ---
+
     function ocultarBloques() {
       identExistente.hidden = true;
       bloqueNoEncontrado.hidden = true;
-      
       bloqueMensaje.hidden = true;
-      bloqueMensaje.className = 'full'; // Resetea la clase (esto es de una corrección anterior)
-
       bloqueRegistro.style.display = 'none';
       badgeEstado.hidden = true;
     }
-
-    // --- HELPER: Función para validar el horario ---
-    function validarHorario(fechaStr, inicioStr, finStr) {
-      try {
-        const now = new Date(); 
-        
-        const [y, m, d] = fechaStr.split('-').map(Number);
-        const [h_inicio, m_inicio] = inicioStr.split(':').map(Number);
-        const [h_fin, m_fin] = finStr.split(':').map(Number);
-
-        const fechaInicio = new Date(y, m - 1, d, h_inicio, m_inicio, 0); 
-        const fechaFin = new Date(y, m - 1, d, h_fin, m_fin, 0);
-
-        if (now < fechaInicio) {
-          return { ok: false, msg: `Tu horario de registro aún no comienza. Puedes registrarte a partir de las ${inicioStr} del ${fechaStr}.` };
-        }
-        if (now > fechaFin) {
-          return { ok: false, msg: `El horario para registrar tu asistencia ha finalizado. La hora límite era las ${finStr} del ${fechaStr}.` };
-        }
-        
-        return { ok: true, msg: 'OK' };
-
-      } catch(e) {
-        console.error("Error al parsear fechas: ", e, {fechaStr, inicioStr, finStr});
-        return { ok: false, msg: 'Error al validar el horario. Contacta al administrador.' };
-      }
-    }
-
 
     // --- 1. VERIFICAR CÉDULA ---
     btnVerificar.addEventListener('click', async () => {
@@ -256,34 +224,24 @@
         params.append('cedula', cedula);
 
         const res = await fetch(API_URL, { method: 'POST', body: params });
-        const data = await res.json();
+        const data = await res.json(); 
         
-        // --- INICIO DE LA CORRECCIÓN ---
-        // (La línea de abajo es para depurar, puedes borrarla si quieres)
-        console.log('DATOS RECIBIDOS:', data); 
-
         if (data.found) {
           identExistente.hidden = false;
           document.getElementById('apellidos_ro').value = data.apellidos || '';
           document.getElementById('nombres_ro').value = data.nombres || '';
           badgeEstado.hidden = false;
 
-          // Hacemos que la variable sea fácil de leer (ej. "HABILITADO", "ASISTIÓ", "PENDIENTE")
           const estadoAsistencia = (data.estado_asistencia || 'PENDIENTE').toUpperCase();
 
-          // CAMBIO: Se usa 'estadoAsistencia' en lugar de 'data.estado'
           if (estadoAsistencia === 'ASISTIÓ' || estadoAsistencia === 'REGISTRADO') {
             badgeEstado.textContent = 'Asistencia Registrada';
             badgeEstado.className = 'badge ok';
             showMensaje('¡Ya has registrado tu asistencia para esta sesión!', 'ok');
-            
-          // CAMBIO: Se usa 'estadoAsistencia' en lugar de 'data.estado'
           } else if (estadoAsistencia === 'HABILITADO') {
             badgeEstado.textContent = 'Habilitado';
             badgeEstado.className = 'badge ok';
-            
             const horario = validarHorario(data.fecha, data.horaInicio, data.horaFin);
-            
             if (horario.ok) {
               bloqueRegistro.style.display = 'block';
               document.getElementById('info-modalidad').textContent = data.modalidad;
@@ -291,20 +249,16 @@
             } else {
               showMensaje(horario.msg, 'info');
             }
-            
           } else {
-            // "PENDIENTE" o cualquier otro estado
             badgeEstado.textContent = 'No Habilitado';
             badgeEstado.className = 'badge err';
             showMensaje('Aún no estás habilitado para registrar asistencia. Contacta a tu coordinador.', 'info');
           }
-          // --- FIN DE LA CORRECCIÓN ---
-
         } else {
           bloqueNoEncontrado.hidden = false;
           badgeEstado.hidden = true;
+          showMensaje('No encontramos tu cédula en la base de datos.', 'err');
         }
-        
       } catch (err) {
         console.error(err);
         showMensaje('Error de conexión. Revisa tu internet e intenta nuevamente.', 'err');
@@ -315,11 +269,9 @@
       }
     });
 
-    // --- 2. REGISTRAR ASISTENCIA (SUBMIT) ---
-    // (Esta función estaba bien, no necesita cambios)
+    // --- 2. REGISTRAR ASISTENCIA ---
     document.getElementById('frm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const originalBtnHTML = btnRegistrar.innerHTML;
       btnRegistrar.disabled = true;
       btnRegistrar.innerHTML = '<span class="spinner"></span> Registrando...';
