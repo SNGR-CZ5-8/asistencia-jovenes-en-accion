@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
+    /* --- AQUÍ ESTÁ TODO TU DISEÑO (CSS) --- */
     :root{
       --brand:#2F338F; --brand-600:#242870;
       --bg:#f4f6fb; --card:#ffffff;
@@ -72,7 +73,7 @@
       display:flex; gap:12px; align-items:flex-start;
       padding:14px 16px; border:1px solid;
       border-radius:12px; font-size:.95rem; margin:8px 0 16px;
-    }
+  _}
     .notice.err{border-color:var(--err); background:#fef2f2; color:#7f1d1d;}
     .notice.ok{border-color:var(--ok); background:#ecfdf5; color:#065f46;}
     .notice.info{border-color:#93c5fd; background:#eff6ff; color:var(--info);}
@@ -129,7 +130,7 @@
               </button>
               <span id="badge-estado" class="badge" hidden></span>
             </div>
-    _       <div class="helper">Solo números – 10 dígitos.</div>
+            <div class="helper">Solo números – 10 dígitos.</div>
           </div>
 
           <div id="ident-existente" class="full" hidden>
@@ -149,7 +150,7 @@
             <div class="notice err">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="2"></circle><line x1="12" y1="12" x2="16" y2="16" stroke-width="2"></line><line x1="12" y1="12" x2="8" y2="8" stroke-width="2"></line><line x1="16" y1="8" x2="8" y2="16" stroke-width="2"></line></svg>
               <div><strong>No estás registrado/a.</strong> No podemos encontrar tu cédula en la base de datos de participantes.</div>
-            </div>
+  _       </div>
           </div>
           
           <div id="bloque-mensaje" class="full" hidden></div>
@@ -161,7 +162,7 @@
               <p>Horario: <span id="info-horario"></span></p>
             </div>
             
-            <button type="submit" id="btn-registrar" class="btn btn-primary" style="margin-top: 20px;">
+    _       <button type="submit" id="btn-registrar" class="btn btn-primary" style="margin-top: 20px;">
               <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5" stroke-width="2"></path></svg>
               Registrar mi Asistencia
             </button>
@@ -175,6 +176,7 @@
   <footer>© 2025 SNGR – Coordinación Zonal 5-8 · Uso interno</footer>
 
   <script>
+    // --- ESTA URL APUNTA A TU WORKER DE CLOUDFLARE ---
     const API_URL = "https://yellow-cherry-162f.dylanvillasagua.workers.dev/"; 
 
     // --- ELEMENTOS DEL DOM ---
@@ -198,30 +200,29 @@
     function ocultarBloques() {
       identExistente.hidden = true;
       bloqueNoEncontrado.hidden = true;
-      bloqueMensaje.hidden = true;
+TODO     bloqueMensaje.hidden = true;
       bloqueRegistro.style.display = 'none';
       badgeEstado.hidden = true;
     }
 
     // --- ================================== ---
-    // --- ¡¡¡AQUÍ ESTÁ LA FUNCIÓN AÑADIDA!!! ---
+    // ---       AQUÍ ESTÁ LA CORRECCIÓN     ---
+    // --- (La función 'validarHorario' que faltaba) ---
     // --- ================================== ---
     function validarHorario(fechaStr, horaInicioStr, horaFinStr) {
       try {
         // Si falta algún dato, permite el registro por si acaso
         if (!fechaStr || !horaInicioStr || !horaFinStr) {
+          console.warn("Faltan datos de horario, se permite el registro.");
           return { ok: true };
         }
 
         const ahora = new Date();
 
-        // Asumimos que las fechas del sheet (YYYY-MM-DD) y horas (HH:mm)
-        // están en la zona horaria local de Ecuador (o del servidor)
         const [y, m, d] = fechaStr.split('-').map(Number);
         const [hi, mi] = horaInicioStr.split(':').map(Number);
         const [hf, mf] = horaFinStr.split(':').map(Number);
 
-        // Creamos las fechas de inicio y fin
         // El mes en JavaScript es 0-indexado (Enero=0), por eso (m - 1)
         const inicio = new Date(y, m - 1, d, hi, mi, 0);
         const fin = new Date(y, m - 1, d, hf, mf, 0);
@@ -237,14 +238,11 @@
 
       } catch (e) {
         console.error("Error al validar horario:", e, {fechaStr, horaInicioStr, horaFinStr});
-        // Si algo falla (ej. formato de fecha), por si acaso lo dejamos pasar
+	  // Si algo falla (ej. formato de fecha), por si acaso lo dejamos pasar
         return { ok: true, msg: "No se pudo validar el horario, se permite el registro." };
       }
     }
     // --- ================================== ---
-    // ---     FIN DE LA FUNCIÓN AÑADIDA     ---
-    // --- ================================== ---
-
 
     // --- 1. VERIFICAR CÉDULA ---
     btnVerificar.addEventListener('click', async () => {
@@ -268,7 +266,8 @@
         const res = await fetch(API_URL, { method: 'POST', body: params });
         
         if (!res.ok) {
-          throw new Error(`Error de conexión. Estado de respuesta: ${res.status}`);
+          // Si el worker da un error (502, 500), esto lo capturará
+          throw new Error(`Error de conexión con el servidor. Estado: ${res.status}`);
         }
 
         const data = await res.json(); 
@@ -291,14 +290,14 @@
             badgeEstado.textContent = 'Habilitado';
             badgeEstado.className = 'badge ok';
             
-            // ¡AQUÍ ESTABA EL ERROR! Ahora 'validarHorario' sí existe
+            // Llamada a la función 'validarHorario' que ahora sí existe
             const horario = validarHorario(data.fecha, data.horaInicio, data.horaFin);
             
             if (horario.ok) {
               bloqueRegistro.style.display = 'block';
               document.getElementById('info-modalidad').textContent = data.modalidad;
               document.getElementById('info-horario').textContent = `${data.horaInicio} - ${data.horaFin} del ${data.fecha}`;
-Click         } else {
+            } else {
               showMensaje(horario.msg, 'info');
             }
           } else {
@@ -312,7 +311,9 @@ Click         } else {
           showMensaje('No encontramos tu cédula en la base de datos.', 'err');
         }
       } catch (err) {
-        console.error('Error de conexión o en la API:', err);  
+        // Esto se activa si el 'fetch' falla (CORS, 502, etc)
+        // o si la función 'validarHorario' falla.
+        console.error('Error capturado:', err);  
         showMensaje('Error de conexión. Revisa tu internet e intenta nuevamente.', 'err');
       } finally {
         btnVerificar.disabled = false;
@@ -337,14 +338,14 @@ Click         } else {
         const data = await res.json();
 
         if (data.success) {
-          ocultarBloques(); 
+          ocultarBloques();TE
           identExistente.hidden = false;
           badgeEstado.textContent = 'Asistencia Registrada';
           badgeEstado.className = 'badge ok';
           showMensaje('¡Asistencia registrada con éxito!', 'ok');
         } else {
           showMensaje(data.message || 'Error desconocido.', 'err');
-          btnRegistrar.disabled = false;
+DB         btnRegistrar.disabled = false;
           btnRegistrar.innerHTML = originalBtnHTML;
         }
         
@@ -354,7 +355,7 @@ Click         } else {
         btnRegistrar.disabled = false;
         btnRegistrar.innerHTML = originalBtnHTML;
       }
-    });
+_   });
   </script>
 </body>
 </html>
